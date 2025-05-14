@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'hacker_news/styles.css' %}">
+    <header>
+        <div class="nav-left">
+            <h1>Y Hacker News</h1>
+            <a href="{% if user_authenticated %}{% url 'hacker_news:newest' %}{% else %}{% url 'hacker_news:login' %}{% endif %}">News</a>
+        <a href="{% if user_authenticated %}{% url 'hacker_news:past' %}{% else %}{% url 'hacker_news:login' %}{% endif %}">Past</a>
+        <a href="{% if user_authenticated %}{% url 'hacker_news:submit_view' %}{% else %}{% url 'hacker_news:login' %}{% endif %}">Submit</a>
+           </div>
+        <div class="nav-right">
+            {% if user_authenticated %}
+                <span>{{ username }}</span>
+                <a href="{% url 'hacker_news:logout' %}"><button>Log out</button></a>
+            {% else %}
+                <a href="{% url 'hacker_news:login' %}"><button>Log in</button></a>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="content">
+            <div class="submit-form">
+                <h2>Submit a New Post</h2>
+                {% if messages %}
+                    <ul class="messages">
+                        {% for message in messages %}
+                            <li class="{{ message.tags }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                <form action="{% url 'hacker_news:submit_view'%}" method="post">
+                    {% csrf_token %}
+                    <input type="text" name="title" placeholder="Enter post title" required><br>
+                    <input type="url" name="link" placeholder="Enter URL link" required><br>
+                    <input type="submit" value="Submit Post">
+                </form>
+            </div>
+            <hr>
+</body>
+</html>
