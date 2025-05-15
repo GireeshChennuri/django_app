@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'hacker_news/styles.css' %}">
+</head>
+<body>
+ 
+    <header>
+        <div class="nav-left">
+            <a href="{% url 'hacker_news:home' %}"><h1>Y Hacker News</h1></a>
+            <a href="{% if user_authenticated %}{% url 'hacker_news:newest' %}{% else %}{% url 'hacker_news:login' %}{% endif %}">News</a>
+        <a href="{% if user_authenticated %}{% url 'hacker_news:past' %}{% else %}{% url 'hacker_news:login' %}{% endif %}">Past</a>
+        <a href="{% if user_authenticated %}{% url 'hacker_news:submit_view' %}{% else %}{% url 'hacker_news:login' %}{% endif %}">Submit</a>
+           </div>
+        <div class="nav-right">
+            {% if user_authenticated %}
+                <span>{{ username }}</span>
+                <a href="{% url 'hacker_news:logout' %}"><button>Log out</button></a>
+            {% else %}
+                <a href="{% url 'hacker_news:login' %}"><button>Log in</button></a>
+            {% endif %}
+        </div>
+    </header>
+    <div class="content">
+        {% for post in posts %}
+            <div class="post">
+                <a href="{{post.link}}" style="text-decoration: none; color: black;"><div class="post-title">{{ post.title }}</div></a>
+                <div class="post-meta">
+                    {% if user_authenticated %}
+                    {% with vote_type='like' %}
+                        <a href="{% url 'hacker_news:handle_vote' post.id vote_type %}"><span>👍 {{ post.likes }}</span></a> &nbsp;
+                        {% endwith %}
+                        {% with vote_type='dislike' %}
+                        <a href="{% url 'hacker_news:handle_vote' post.id vote_type %}"><span>👎 {{ post.dislikes }}</span></a> &nbsp;
+                        {% endwith %}
+                        <a href="{% url 'hacker_news:comment' post.id%}"><span>💬 comments</span></a> &nbsp;
+
+                    {% else %}
+                        <a href="{% url 'hacker_news:login' %}"><span>👍 {{ post.likes }}</span></a> &nbsp;
+                        <a href="{% url 'hacker_news:login' %}"><span>👎 {{ post.dislikes }}</span></a> &nbsp;
+                        <a href="{% url 'hacker_news:login' %}"><span>💬 comments</span></a> &nbsp;
+                    {% endif %}
+                    🕒 {{ post.created_at|timesince }} ago
+                </div>
+            </div>
+        {% empty %}
+            <p>No posts available.</p>
+        {% endfor %}
+        
+    </div>
+</body>
+</html>
